@@ -37,31 +37,27 @@ import com.example.weatherforecastapp.R
 fun WeatherScreen(
     modifier : Modifier = Modifier,
     weatherViewModel : WeatherViewModel = viewModel()
-)
-{
-        val uiState by weatherViewModel.uiState.collectAsState()
-        WeatherForecastUI(state = uiState)
+) {
+    val uiState by weatherViewModel.uiState.collectAsState()
+    WeatherForecastUI(state = uiState, modifier = modifier)
 }
-
-
-
 
 @Composable
 fun WeatherForecastUI(
-    state : WeatherUiState ,//参数类型是 WeatherUiState类
-    modifier : Modifier = Modifier) {
+    state : WeatherUiState,
+    modifier : Modifier = Modifier
+) {
     Box(modifier = Modifier.fillMaxSize()) {
-        Image(painter = painterResource(id = R.drawable.weather_background),
+        Image(
+            painter = painterResource(id = R.drawable.weather_background),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
 
-        Column(modifier = modifier.fillMaxSize())
-        {
+        Column(modifier = modifier.fillMaxSize()) {
             Column(modifier = Modifier.padding(vertical = 100.dp, horizontal = 16.dp)) {
-                Text(text = state.cityName,
-                    color = Color.White)
+                Text(text = state.cityName, color = Color.White)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = state.currentTemperature,
@@ -71,13 +67,12 @@ fun WeatherForecastUI(
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = state.weatherDescription,
-                    color = Color.White,)
+                Text(text = state.weatherDescription, color = Color.White)
             }
             Spacer(modifier = Modifier.weight(1f))
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
@@ -86,19 +81,18 @@ fun WeatherForecastUI(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     state.forecastItems.forEach { items ->
-                        Row(modifier = modifier.fillMaxWidth(),
+                        Row(
+                            modifier = Modifier.fillMaxWidth(), // 修复：使用新的 Modifier
                             horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically)
-                        {
-                            Text(text = "${items.dayOfWeek} ${items.weather}" ,
-                                color = Color.White)
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = "${items.dayOfWeek} ${items.weather}", color = Color.White)
                             Icon(
                                 imageVector = Icons.Filled.Star,
                                 contentDescription = null,
                                 tint = Color.White
                             )
-                            Text(text = items.temperatureRange,
-                                color = Color.White)
+                            Text(text = items.temperatureRange, color = Color.White)
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -108,7 +102,7 @@ fun WeatherForecastUI(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun WeatherForecastPreview() {
     WeatherScreen()
