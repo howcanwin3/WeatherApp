@@ -54,4 +54,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // Retrofit 核心库
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    // Gson 转换器（自动把服务器返回的 JSON 字符串转成我们的 Kotlin Data Class）
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
 }
