@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.weatherforecastapp.ui.screen.WeatherForecastUI
+import com.example.weatherforecastapp.ui.screen.WeatherScreen
 import com.example.weatherforecastapp.ui.theme.WeatherForecastAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -15,17 +15,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WeatherForecastAppTheme {
+                WeatherScreen()
             }
         }
     }
 }
 
-
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     WeatherForecastAppTheme {
-        WeatherForecastUI()
+        WeatherScreen()
     }
 }
