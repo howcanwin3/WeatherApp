@@ -25,12 +25,36 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherforecastapp.R
 
+
 @Composable
-fun WeatherForecastUI(modifier : Modifier = Modifier) {
+fun WeatherScreen() {
+    // 模拟一个假数据（这堆东西以后会变成由 ViewModel 从网络框架里拉出来）
+    val mockUiState = WeatherUiState(
+        cityName = "纽约",
+        currentTemperature = "17℃",
+        weatherDescription = "多云 最高 24℃ 最低 16℃",
+        forecastItems = listOf(
+            ForecastItem("星期一", "晴", "17℃-----24℃"),
+            ForecastItem("星期二", "多云", "16℃-----28℃"),
+            ForecastItem("星期三", "雷阵雨", "20℃-----30℃")
+        )
+    )
+
+    // 把假数据传给 UI
+    WeatherForecastUI(state = mockUiState)
+}
+
+
+
+@Composable
+fun WeatherForecastUI(
+    state : WeatherUiState ,//参数类型是 WeatherUiState类
+    modifier : Modifier = Modifier) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(painter = painterResource(id = R.drawable.weather_background),
             contentDescription = null,
@@ -41,18 +65,18 @@ fun WeatherForecastUI(modifier : Modifier = Modifier) {
         Column(modifier = modifier.fillMaxSize())
         {
             Column(modifier = Modifier.padding(vertical = 100.dp, horizontal = 16.dp)) {
-                Text(text = "纽约",
+                Text(text = state.cityName,
                     color = Color.White)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "17℃",
+                    text = state.currentTemperature,
                     fontSize = 50.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Light,
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "多云 最高 24℃ 最低 16℃",
+                Text(text = state.weatherDescription,
                     color = Color.White,)
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -64,48 +88,33 @@ fun WeatherForecastUI(modifier : Modifier = Modifier) {
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White.copy(alpha = 0.3f)
                 )
-
-
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Row(horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth())
-                    {
-                        Text(text = "星期一 晴")
-                        Icon(
-                            imageVector = Icons.Filled.Star,
-                            contentDescription = null
-                        )
-                        Text(text = "17℃-----24℃",)
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "星期二 晴")
-
-
-                        Icon(
-                            imageVector = Icons.Filled.Star,
-                            contentDescription = null
-                        )
-
-                        Text(text = "16℃-----28℃",)
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "星期三 晴")
-                        Icon(
-                            imageVector = Icons.Filled.Star,
-                            contentDescription = null
-                        )
-                        Text(text = "20℃-----30℃",)
+                    state.forecastItems.forEach { items ->
+                        Row(modifier = modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically)
+                        {
+                            Text(text = "${items.dayOfWeek} ${items.weather}" ,
+                                color = Color.White)
+                            Icon(
+                                imageVector = Icons.Filled.Star,
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                            Text(text = items.temperatureRange,
+                                color = Color.White)
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun WeatherForecastPreview() {
+    WeatherScreen()
 }
