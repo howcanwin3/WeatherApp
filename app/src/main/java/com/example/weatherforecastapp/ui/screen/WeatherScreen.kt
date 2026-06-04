@@ -19,6 +19,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,26 +30,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.weatherforecastapp.R
 
-
 @Composable
-fun WeatherScreen() {
-    // 模拟一个假数据（这堆东西以后会变成由 ViewModel 从网络框架里拉出来）
-    val mockUiState = WeatherUiState(
-        cityName = "纽约",
-        currentTemperature = "17℃",
-        weatherDescription = "多云 最高 24℃ 最低 16℃",
-        forecastItems = listOf(
-            ForecastItem("星期一", "晴", "17℃-----24℃"),
-            ForecastItem("星期二", "多云", "16℃-----28℃"),
-            ForecastItem("星期三", "雷阵雨", "20℃-----30℃")
-        )
-    )
-
-    // 把假数据传给 UI
-    WeatherForecastUI(state = mockUiState)
+fun WeatherScreen(
+    modifier : Modifier = Modifier,
+    weatherViewModel : WeatherViewModel = viewModel()
+)
+{
+        val uiState by weatherViewModel.uiState.collectAsState()
+        WeatherForecastUI(state = uiState)
 }
+
 
 
 
