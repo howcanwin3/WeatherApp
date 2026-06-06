@@ -36,7 +36,7 @@ import com.example.weatherforecastapp.R
 @Composable
 fun WeatherScreen(
     modifier : Modifier = Modifier,
-    weatherViewModel : WeatherViewModel = viewModel()
+    weatherViewModel : WeatherViewModel = viewModel(factory = WeatherViewModel.Factory)
 ) {
     val uiState by weatherViewModel.uiState.collectAsState()
     WeatherForecastUI(state = uiState, modifier = modifier)

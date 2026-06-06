@@ -3,7 +3,7 @@ package com.example.weatherforecastapp.ui.screen
 data class ForecastItem(
     val dayOfWeek: String,
     val weather: String,
-    val temperatureRange: String,
+    val temperatureRange : String,
 )
 
 data class WeatherUiState(
