@@ -1,18 +1,17 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    // 1. 应用 Kotlin 序列化插件
     alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "com.example.weatherforecastapp"
-    compileSdk = 35
+    compileSdk = 36 // 提升至 36，这是 AGP 9.0.1 支持的最高版本
 
     defaultConfig {
         applicationId = "com.example.weatherforecastapp"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36 // 同步提升至 36
         versionCode = 1
         versionName = "1.0"
 
@@ -57,7 +56,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    // 2. 使用 Kotlin Serialization 相关的 Retrofit 依赖
     implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit.converter.kotlinx.serialization)
