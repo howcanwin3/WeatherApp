@@ -14,25 +14,32 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class WeatherViewModel(private val weatherRepository : WeatherRepository ) : ViewModel() {//自定义的ViewModel首先都要继承官方的ViewModel
-    //1.ViewModel定义一个内部私有的状态流，用于内部修改数据
-
-    private val _uiState = MutableStateFlow(WeatherUiState("","", "", emptyList<ForecastItem>()))
-        //给StateFlow一个初始值---数据流里可以是任何类型一个int 一个string 一个实例都行
-    //2.公开的只读state用于UI访问
+class WeatherViewModel(private val weatherRepository : WeatherRepository ) : ViewModel() {
+    
+    //  给出合理的默认初始值，避免一上来就是空白
+    private val _uiState = MutableStateFlow(
+        WeatherUiState("加载中...", "--℃", "正在获取天气数据...", emptyList())
+    )
     val uiState : StateFlow<WeatherUiState> = _uiState.asStateFlow()
 
     fun fetchWeather(locationId : String, apiKey : String) {
-        viewModelScope.launch{
-            try{
-                val dto = weatherRepository.getWeather(locationId,apiKey)
+        viewModelScope.launch {
+            try {
+                val dto = weatherRepository.getWeather(locationId, apiKey)
                 _uiState.value = dto.toWeatherUiState()
-            }catch(e:Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
+                //  捕捉具体错误（例如 403 Forbidden），反馈到 UI 界面上，方便调试
+                _uiState.value = _uiState.value.copy(
+                    cityName = "加载失败",
+                    currentTemperature = "--℃",
+                    weatherDescription = "错误原因: ${e.message ?: "未知网络错误"}"
+                )
             }
         }
     }
-    companion object{
+
+    companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as WeatherApplication)
@@ -41,9 +48,4 @@ class WeatherViewModel(private val weatherRepository : WeatherRepository ) : Vie
             }
         }
     }
-
-
-
 }
-
-
