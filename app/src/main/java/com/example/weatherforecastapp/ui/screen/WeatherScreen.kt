@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,9 +37,14 @@ import com.example.weatherforecastapp.R
 @Composable
 fun WeatherScreen(
     modifier : Modifier = Modifier,
-    weatherViewModel : WeatherViewModel = viewModel()
+    weatherViewModel : WeatherViewModel = viewModel(factory = WeatherViewModel.Factory)
 ) {
     val uiState by weatherViewModel.uiState.collectAsState()
+    LaunchedEffect(Unit){
+        weatherViewModel.fetchWeather(locationId = "101020100" , apiKey = "a66369e0e13b4ef7837beb5437dbfdf0")
+    }
+
+
     WeatherForecastUI(state = uiState, modifier = modifier)
 }
 
