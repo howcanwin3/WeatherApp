@@ -10,7 +10,7 @@ fun WeatherDto.toWeatherUiState(cityName : String = "上海") : WeatherUiState {
     //返回一个WeatherUiState对象
     return WeatherUiState(
         cityName = cityName,
-        currentTemperature = "${today?.tempMax?:"0"}",
+        currentTemperature = "${today?.tempMax ?: "0"}",
         weatherDescription = "${today?.textDay?:"--"}",
         forecastItems = this.dailyList.map{         //list的扩展函数map 遍历列表将箭头左边的类映射到右边
             dailyDto ->ForecastItem(

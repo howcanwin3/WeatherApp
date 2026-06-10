@@ -38,12 +38,16 @@ class WeatherViewModel(private val weatherRepository : WeatherRepository ) : Vie
             }
         }
     }
-
+//companion object就像写给WeatherViewModel的说明书：请先去仓库（Application）里拿一节电池（Repository），装进车里（传进构造函数），再把这辆车吐出来！
     companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
+        val Factory : ViewModelProvider.Factory = viewModelFactory {
+            //初始化器
             initializer {
+                //1.先去找到Application单例
                 val application = (this[APPLICATION_KEY] as WeatherApplication)
+                //2.打开单例中的container把里面的Repository取出来
                 val weatherRepository = application.container.weatherRepository
+                //3.把Repository传给ViewModel
                 WeatherViewModel(weatherRepository = weatherRepository)
             }
         }

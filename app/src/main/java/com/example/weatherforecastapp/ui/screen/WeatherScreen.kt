@@ -41,7 +41,7 @@ fun WeatherScreen(
 ) {
     val uiState by weatherViewModel.uiState.collectAsState()
     LaunchedEffect(Unit){
-        weatherViewModel.fetchWeather(locationId = "101020100" , apiKey = "6eab355a386c4d4ebf73abac18f530ea")
+        weatherViewModel.fetchWeather(locationId = "101020100" , apiKey ="f53a4407ba4c4886a8e7cb674f8a8264")
     }
     WeatherForecastUI(state = uiState, modifier = modifier)
 }

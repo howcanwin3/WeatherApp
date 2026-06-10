@@ -13,7 +13,7 @@ interface AppContainer {
 }
 
 class DefaultAppContainer : AppContainer {
-    private val baseUrl = "https://devapi.qweather.com/"
+    private val baseUrl = "https://n36yw2tu52.re.qweatherapi.com/"
     //手动造一个新json用于忽略不认识的字段
     private val json = Json { ignoreUnknownKeys = true }
     //初始化Retrofit
