@@ -8,7 +8,7 @@ fun WeatherDto.toWeatherUiState(cityName : String = "上海") : WeatherUiState {
 
     val today = this.dailyList.firstOrNull()//由于Dto拿到的是一个List->拿到列表中第一个元素
     //返回一个WeatherUiState对象
-    return WeatherUiState(
+    return WeatherUiState.Success(
         cityName = cityName,
         currentTemperature = "${today?.tempMax ?: "0"}",
         weatherDescription = "${today?.textDay?:"--"}",

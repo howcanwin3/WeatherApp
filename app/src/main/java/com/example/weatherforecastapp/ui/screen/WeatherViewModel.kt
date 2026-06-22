@@ -16,25 +16,24 @@ import kotlinx.coroutines.launch
 
 class WeatherViewModel(private val weatherRepository : WeatherRepository ) : ViewModel() {
     
-    //  给出合理的默认初始值，避免一上来就是空白
-    private val _uiState = MutableStateFlow(
-        WeatherUiState("加载中...", "--℃", "正在获取天气数据...", emptyList())
-    )
+    //  给出合理的默认初始值，将默认值直接设为loading
+    private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Loading)
+
     val uiState : StateFlow<WeatherUiState> = _uiState.asStateFlow()
 
     fun fetchWeather(locationId : String, apiKey : String) {
         viewModelScope.launch {
+            _uiState.value = WeatherUiState.Loading
             try {
                 val dto = weatherRepository.getWeather(locationId, apiKey)
                 _uiState.value = dto.toWeatherUiState()
             } catch (e: Exception) {
                 e.printStackTrace()
                 //  捕捉具体错误（例如 403 Forbidden），反馈到 UI 界面上，方便调试
-                _uiState.value = _uiState.value.copy(
-                    cityName = "加载失败",
-                    currentTemperature = "--℃",
-                    weatherDescription = "错误原因: ${e.message ?: "未知网络错误"}"
+                _uiState.value = WeatherUiState.Error(
+                    message = e.message ?: "Unknown Internet error"
                 )
+
             }
         }
     }
