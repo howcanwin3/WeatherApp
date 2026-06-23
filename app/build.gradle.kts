@@ -1,8 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    // 1. 应用 Kotlin 序列化插件
     alias(libs.plugins.kotlin.serialization)
+    // 1. 使用 KSP 替代 KAPT，适配现代化的编译环境
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -57,9 +58,13 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    // 2. 引入 Retrofit 和 Kotlin Serialization 相关依赖
     implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit.converter.kotlinx.serialization)
     implementation(libs.okhttp)
+
+    // 2. 引入 Room 数据库相关依赖 (适配 Kotlin 2.4.0 的 KSP 方案)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler) // 注解处理器切换为 ksp
 }
