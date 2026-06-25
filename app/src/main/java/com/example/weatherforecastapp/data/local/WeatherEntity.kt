@@ -3,7 +3,7 @@ package com.example.weatherforecastapp.data.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "weather")
+@Entity(tableName = "weather_cache")
 data class WeatherEntity(
     @PrimaryKey
     val cityName: String,

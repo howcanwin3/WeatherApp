@@ -1,5 +1,6 @@
 package com.example.weatherforecastapp.ui.mapper
 
+import com.example.weatherforecastapp.data.local.WeatherEntity
 import com.example.weatherforecastapp.data.remote.model.WeatherDto
 import com.example.weatherforecastapp.ui.screen.ForecastItem
 import com.example.weatherforecastapp.ui.screen.WeatherUiState
@@ -22,3 +23,23 @@ fun WeatherDto.toWeatherUiState(cityName : String = "上海") : WeatherUiState {
     )
 }
 
+// 扩展函数 toEntity ----> 为了将 Dto 对象映射成 Entity 对象
+fun WeatherDto.toEntity(cityName: String): WeatherEntity {
+    // 拿到 dailyList 里第一天的数据（代表当前或今日天气）
+    val today = this.dailyList.firstOrNull()
+    return WeatherEntity(
+        cityName = cityName,
+        currentTemperature = "${today?.tempMax ?: "0"}℃", // 建议带上单位，保持一致
+        description = today?.textDay ?: "--"
+    )
+}
+
+//这里还需要再将Entity 对象映射成 WeatherUiState 对象
+fun WeatherEntity.toWeatherUiState(): WeatherUiState.Success{
+    return WeatherUiState.Success(
+        cityName = this.cityName,
+        currentTemperature = this.currentTemperature,
+        weatherDescription = this.description,
+        forecastItems = emptyList()
+    )
+}
