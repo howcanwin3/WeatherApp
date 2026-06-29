@@ -35,7 +35,7 @@ fun WeatherDto.toEntity(cityName: String): WeatherEntity {
 }
 
 //这里还需要再将Entity 对象映射成 WeatherUiState 对象
-fun WeatherEntity.toWeatherUiState(): WeatherUiState.Success{
+fun WeatherEntity.toWeatherUiStateFromCache(): WeatherUiState.Success{
     return WeatherUiState.Success(
         cityName = this.cityName,
         currentTemperature = this.currentTemperature,

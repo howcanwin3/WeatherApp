@@ -1,53 +1,57 @@
 package com.example.weatherforecastapp.ui.screen
 
-import WeatherRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.weatherforecastapp.WeatherApplication
-import com.example.weatherforecastapp.ui.mapper.toWeatherUiState
+import com.example.weatherforecastapp.data.local.WeatherDatabase
+import com.example.weatherforecastapp.data.remote.WeatherApi
+import com.example.weatherforecastapp.data.repository.WeatherRepository
+import com.example.weatherforecastapp.data.repository.WeatherRepositoryImp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class WeatherViewModel(private val weatherRepository : WeatherRepository ) : ViewModel() {
+class WeatherViewModel(private val weatherRepository: WeatherRepository) : ViewModel() {
     
-    //  给出合理的默认初始值，将默认值直接设为loading
     private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Loading)
+    val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
 
-    val uiState : StateFlow<WeatherUiState> = _uiState.asStateFlow()
-
-    fun fetchWeather(locationId : String, apiKey : String) {
+    fun fetchWeather(locationId: String, apiKey: String) {
         viewModelScope.launch {
             _uiState.value = WeatherUiState.Loading
             try {
-                val dto = weatherRepository.getWeather(locationId, apiKey)
-                _uiState.value = dto.toWeatherUiState()
+                val resultState = weatherRepository.getWeather(locationId, apiKey)
+                _uiState.value = resultState
             } catch (e: Exception) {
                 e.printStackTrace()
-                //  捕捉具体错误（例如 403 Forbidden），反馈到 UI 界面上，方便调试
                 _uiState.value = WeatherUiState.Error(
-                    message = e.message ?: "Unknown Internet error"
+                    message = e.localizedMessage ?: "Unknown error"
                 )
-
             }
         }
     }
-//companion object就像写给WeatherViewModel的说明书：请先去仓库（Application）里拿一节电池（Repository），装进车里（传进构造函数），再把这辆车吐出来！
+
     companion object {
-        val Factory : ViewModelProvider.Factory = viewModelFactory {
-            //初始化器
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                //1.先去找到Application单例
-                val application = (this[APPLICATION_KEY] as WeatherApplication)
-                //2.打开单例中的container把里面的Repository取出来
-                val weatherRepository = application.container.weatherRepository
-                //3.把Repository传给ViewModel
-                WeatherViewModel(weatherRepository = weatherRepository)
+                // 直接从系统环境拿到 Context，不需要自定义 Application 类
+                val application = this[APPLICATION_KEY]!!
+                
+                // 1. 初始化数据库
+                val database = WeatherDatabase.getDatabase(application)
+                
+                // 2. 初始化仓库，并手动把“零件”（ApiService 和 Dao）装进去
+                val repository = WeatherRepositoryImp(
+                    apiService = WeatherApi.retrofitService,
+                    weatherDao = database.weatherDao()
+                )
+                
+                // 3. 返回创建好的 ViewModel
+                WeatherViewModel(weatherRepository = repository)
             }
         }
     }

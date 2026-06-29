@@ -1,35 +1,45 @@
 package com.example.weatherforecastapp.data.container
 
-import WeatherRepository
-import WeatherRepositoryImp
+import android.content.Context
+import com.example.weatherforecastapp.data.local.WeatherDatabase
 import com.example.weatherforecastapp.data.remote.WeatherApiService
+import com.example.weatherforecastapp.data.repository.WeatherRepository
+import com.example.weatherforecastapp.data.repository.WeatherRepositoryImp
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 interface AppContainer {
-    val weatherRepository: WeatherRepository//AppContainer的属性
+    val weatherRepository: WeatherRepository
 }
 
-class DefaultAppContainer : AppContainer {
+/**
+ * 修复：DefaultAppContainer 现在接收 context 参数，以便初始化本地数据库
+ */
+class DefaultAppContainer(private val context: Context) : AppContainer {
     private val baseUrl = "https://n36yw2tu52.re.qweatherapi.com/"
-    //手动造一个新json用于忽略不认识的字段
+    
     private val json = Json { ignoreUnknownKeys = true }
-    //初始化Retrofit
-    private val retrofit : Retrofit by lazy{
+    
+    private val retrofit : Retrofit by lazy {
         Retrofit.Builder()
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .baseUrl(baseUrl)
             .build()
     }
-    //定义了一个私有的天气网络请求服务，让 Retrofit 帮你create一个对象。
-    private val retrofitService : WeatherApiService by lazy{
+
+    private val retrofitService : WeatherApiService by lazy {
         retrofit.create(WeatherApiService::class.java)
     }
 
-    //实现数据仓库接口-->往数据仓库接口里传入retrofitService对象
-    override val weatherRepository : WeatherRepository by lazy{
-        WeatherRepositoryImp(retrofitService)
+
+     //从数据库单例中获取 weatherDao
+
+    override val weatherRepository : WeatherRepository by lazy {
+        WeatherRepositoryImp(
+            apiService = retrofitService,
+            weatherDao = WeatherDatabase.getDatabase(context).weatherDao()
+        )
     }
 }
