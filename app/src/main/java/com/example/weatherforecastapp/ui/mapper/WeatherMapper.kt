@@ -1,45 +1,70 @@
-package com.example.weatherforecastapp.ui.mapper
+﻿package com.example.weatherforecastapp.ui.mapper
 
 import com.example.weatherforecastapp.data.local.WeatherEntity
 import com.example.weatherforecastapp.data.remote.model.WeatherDto
 import com.example.weatherforecastapp.ui.screen.ForecastItem
 import com.example.weatherforecastapp.ui.screen.WeatherUiState
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
-fun WeatherDto.toWeatherUiState(cityName : String = "上海") : WeatherUiState {
+fun WeatherDto.toWeatherUiState(cityName: String = "上海"): WeatherUiState.Success {
+    val today = dailyList.firstOrNull()
 
-    val today = this.dailyList.firstOrNull()//由于Dto拿到的是一个List->拿到列表中第一个元素
-    //返回一个WeatherUiState对象
     return WeatherUiState.Success(
         cityName = cityName,
-        currentTemperature = "${today?.tempMax ?: "0"}",
-        weatherDescription = "${today?.textDay?:"--"}",
-        forecastItems = this.dailyList.map{         //list的扩展函数map 遍历列表将箭头左边的类映射到右边
-            dailyDto ->ForecastItem(
-            dayOfWeek = dailyDto.fxDate,
-            weather = dailyDto.textDay,
-            temperatureRange = "${dailyDto.tempMin}-----${dailyDto.tempMax}"
+        currentTemperature = "${today?.tempMax ?: "--"}℃",
+        weatherDescription = today?.textDay ?: "--",
+        forecastItems = dailyList.map { dailyDto ->
+            ForecastItem(
+                dayOfWeek = formatForecastLabel(dailyDto.fxDate),
+                weather = dailyDto.textDay,
+                temperatureRange = "${dailyDto.tempMin}℃ - ${dailyDto.tempMax}℃"
             )
-        }
+        },
+        lastUpdatedText = formatLastUpdated(System.currentTimeMillis()),
+        sourceLabel = "实时数据"
     )
 }
 
-// 扩展函数 toEntity ----> 为了将 Dto 对象映射成 Entity 对象
 fun WeatherDto.toEntity(cityName: String): WeatherEntity {
-    // 拿到 dailyList 里第一天的数据（代表当前或今日天气）
-    val today = this.dailyList.firstOrNull()
+    val today = dailyList.firstOrNull()
     return WeatherEntity(
         cityName = cityName,
-        currentTemperature = "${today?.tempMax ?: "0"}℃", // 建议带上单位，保持一致
+        currentTemperature = "${today?.tempMax ?: "--"}℃",
         description = today?.textDay ?: "--"
     )
 }
 
-//这里还需要再将Entity 对象映射成 WeatherUiState 对象
-fun WeatherEntity.toWeatherUiStateFromCache(): WeatherUiState.Success{
+fun WeatherEntity.toWeatherUiStateFromCache(): WeatherUiState.Success {
     return WeatherUiState.Success(
-        cityName = this.cityName,
-        currentTemperature = this.currentTemperature,
-        weatherDescription = this.description,
-        forecastItems = emptyList()
+        cityName = cityName,
+        currentTemperature = currentTemperature,
+        weatherDescription = description,
+        forecastItems = emptyList(),
+        lastUpdatedText = formatLastUpdated(lastUpdated),
+        sourceLabel = "离线缓存"
     )
+}
+
+private fun formatLastUpdated(timestamp: Long): String {
+    val formatter = SimpleDateFormat("MM月dd日 HH:mm", Locale.getDefault())
+    return "更新于 ${formatter.format(Date(timestamp))}"
+}
+
+private fun formatForecastLabel(fxDate: String): String {
+    val parser = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val date = runCatching { parser.parse(fxDate) }.getOrNull() ?: return fxDate
+    val calendar = Calendar.getInstance().apply { time = date }
+    return when (calendar.get(Calendar.DAY_OF_WEEK)) {
+        Calendar.SUNDAY -> "周日"
+        Calendar.MONDAY -> "周一"
+        Calendar.TUESDAY -> "周二"
+        Calendar.WEDNESDAY -> "周三"
+        Calendar.THURSDAY -> "周四"
+        Calendar.FRIDAY -> "周五"
+        Calendar.SATURDAY -> "周六"
+        else -> fxDate
+    }
 }

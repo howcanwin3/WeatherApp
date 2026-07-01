@@ -1,10 +1,21 @@
+﻿import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    // 1. 使用 KSP 替代 KAPT，适配现代化的编译环境
     alias(libs.plugins.ksp)
 }
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use(::load)
+    }
+}
+
+val weatherApiKey = (localProperties.getProperty("API_KEY") ?: "")
+    .replace("\"", "\\\"")
 
 android {
     namespace = "com.example.weatherforecastapp"
@@ -18,6 +29,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "QWEATHER_API_KEY", "\"$weatherApiKey\"")
     }
 
     buildTypes {
@@ -35,6 +47,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -63,8 +76,7 @@ dependencies {
     implementation(libs.retrofit.converter.kotlinx.serialization)
     implementation(libs.okhttp)
 
-    // 2. 引入 Room 数据库相关依赖 (适配 Kotlin 2.4.0 的 KSP 方案)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler) // 注解处理器切换为 ksp
+    ksp(libs.androidx.room.compiler)
 }
