@@ -1,5 +1,6 @@
-package com.example.weatherforecastapp.data.repository
+﻿package com.example.weatherforecastapp.data.repository
 
+import com.example.weatherforecastapp.data.config.WeatherDefaults
 import com.example.weatherforecastapp.data.local.WeatherDao
 import com.example.weatherforecastapp.data.local.WeatherEntity
 import com.example.weatherforecastapp.data.remote.WeatherApiService
@@ -8,43 +9,85 @@ import com.example.weatherforecastapp.ui.mapper.toEntity
 import com.example.weatherforecastapp.ui.mapper.toWeatherUiState
 import com.example.weatherforecastapp.ui.mapper.toWeatherUiStateFromCache
 import com.example.weatherforecastapp.ui.screen.WeatherUiState
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-// 仓库接口
 interface WeatherRepository {
-    suspend fun getWeather(locationId: String, apiKey: String): WeatherUiState
+    suspend fun getWeather(cityQuery: String): WeatherUiState
 }
 
-// 仓库实现类
 class WeatherRepositoryImp(
     private val apiService: WeatherApiService,
-    private val weatherDao: WeatherDao
+    private val weatherDao: WeatherDao,
+    private val apiKey: String
 ) : WeatherRepository {
 
-    override suspend fun getWeather(locationId: String, apiKey: String): WeatherUiState {
-        return try {
-            // 1. 尝试从网络获取
-            val response: WeatherDto = apiService.get3dWeather(locationId, apiKey)
-            val cityName = "上海" // 这里建议后续改为动态获取
+    override suspend fun getWeather(cityQuery: String): WeatherUiState =
+        withContext(Dispatchers.IO) {
+            if (apiKey.isBlank()) {
+                return@withContext WeatherUiState.Error(
+                    message = "未配置 API Key，请在 local.properties 中设置 API_KEY"
+                )
+            }
 
-            // 2. 网络成功，存入数据库（转换 DTO -> Entity）
-            weatherDao.insertWeather(response.toEntity(cityName))
+            val normalizedQuery = cityQuery.trim().ifBlank { WeatherDefaults.DEFAULT_CITY_QUERY }
+            var resolvedCityName: String? = null
 
-            // 3. 返回网络获取的成功状态
-            response.toWeatherUiState(cityName)
+            try {
+                val cityLookup = apiService.lookupCity(
+                    location = normalizedQuery,
+                    apiKey = apiKey
+                )
 
-        } catch (e: Exception) {
-            // 4. 网络失败，尝试从本地数据库取出最新的一条记录
-            // 使用 firstOrNull() 获取 Flow 发射的当前值
-            val cachedEntity : WeatherEntity ?= weatherDao.getWeatherByCity("上海").firstOrNull()
+                if (cityLookup.code != "200") {
+                    return@withContext cachedOrError(
+                        query = normalizedQuery,
+                        defaultMessage = "未找到城市：$normalizedQuery"
+                    )
+                }
 
-            if (cachedEntity != null) {
-                // 如果本地有缓存，转换并返回（Entity -> Success）
-                cachedEntity.toWeatherUiStateFromCache()
-            } else {
-                // 如果本地也没数据，返回错误状态
-                WeatherUiState.Error(message = "无网络连接且无本地缓存: ${e.localizedMessage}")
+                val city = cityLookup.locations.firstOrNull()
+                    ?: return@withContext cachedOrError(
+                        query = normalizedQuery,
+                        defaultMessage = "未找到城市：$normalizedQuery"
+                    )
+
+                resolvedCityName = city.name
+
+                val response: WeatherDto = apiService.get3dWeather(city.id, apiKey)
+                if (response.code != "200") {
+                    return@withContext cachedOrError(
+                        query = resolvedCityName,
+                        defaultMessage = "天气服务暂时不可用：$normalizedQuery"
+                    )
+                }
+
+                weatherDao.insertWeather(response.toEntity(resolvedCityName))
+                response.toWeatherUiState(resolvedCityName)
+            } catch (e: Exception) {
+                cachedOrError(
+                    query = resolvedCityName ?: normalizedQuery,
+                    defaultMessage = "未能加载 $normalizedQuery 的天气：${e.localizedMessage ?: "未知错误"}"
+                )
             }
         }
+
+    private fun cachedOrError(
+        query: String?,
+        defaultMessage: String
+    ): WeatherUiState {
+        val cachedEntity = query?.let(::findCachedWeather)
+        return cachedEntity?.toWeatherUiStateFromCache()
+            ?: WeatherUiState.Error(message = defaultMessage)
+    }
+
+    private fun findCachedWeather(query: String): WeatherEntity? {
+        return weatherDao.getWeatherByCity(query)
+            ?: weatherDao.searchWeatherByKeyword(query)
+            ?: if (query != WeatherDefaults.DEFAULT_CITY_QUERY) {
+                weatherDao.getWeatherByCity(WeatherDefaults.DEFAULT_CITY_QUERY)
+            } else {
+                null
+            }
     }
 }
