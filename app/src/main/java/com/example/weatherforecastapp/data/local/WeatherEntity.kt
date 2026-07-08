@@ -9,7 +9,7 @@ data class WeatherEntity(
     val cityName: String,
     val currentTemperature: String,
     val description: String,
+    val highTemperature: String,
+    val lowTemperature: String,
     val lastUpdated: Long = System.currentTimeMillis()
 )
-
-

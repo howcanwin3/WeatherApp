@@ -1,4 +1,4 @@
-﻿package com.example.weatherforecastapp.ui.screen
+package com.example.weatherforecastapp.ui.screen
 
 sealed interface WeatherUiState {
     object Loading : WeatherUiState
@@ -10,6 +10,8 @@ sealed interface WeatherUiState {
         val forecastItems: List<ForecastItem>,
         val lastUpdatedText: String,
         val sourceLabel: String,
+        val highTemperature: String,
+        val lowTemperature: String,
     ) : WeatherUiState
 
     data class Error(
@@ -20,5 +22,7 @@ sealed interface WeatherUiState {
 data class ForecastItem(
     val dayOfWeek: String,
     val weather: String,
+    val lowTemperature: String,
+    val highTemperature: String,
     val temperatureRange: String,
 )

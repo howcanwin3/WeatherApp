@@ -9,22 +9,31 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-fun WeatherDto.toWeatherUiState(cityName: String = "上海"): WeatherUiState.Success {
+fun WeatherDto.toWeatherUiState(
+    cityName: String = "上海",
+    sourceLabel: String = "实时数据"
+): WeatherUiState.Success {
     val today = dailyList.firstOrNull()
+    val highTemperature = formatTemperature(today?.tempMax)
+    val lowTemperature = formatTemperature(today?.tempMin)
 
     return WeatherUiState.Success(
         cityName = cityName,
-        currentTemperature = "${today?.tempMax ?: "--"}℃",
+        currentTemperature = highTemperature,
         weatherDescription = today?.textDay ?: "--",
         forecastItems = dailyList.map { dailyDto ->
             ForecastItem(
                 dayOfWeek = formatForecastLabel(dailyDto.fxDate),
                 weather = dailyDto.textDay,
-                temperatureRange = "${dailyDto.tempMin}℃ - ${dailyDto.tempMax}℃"
+                lowTemperature = formatTemperature(dailyDto.tempMin),
+                highTemperature = formatTemperature(dailyDto.tempMax),
+                temperatureRange = "${formatTemperature(dailyDto.tempMin)} - ${formatTemperature(dailyDto.tempMax)}"
             )
         },
         lastUpdatedText = formatLastUpdated(System.currentTimeMillis()),
-        sourceLabel = "实时数据"
+        sourceLabel = sourceLabel,
+        highTemperature = highTemperature,
+        lowTemperature = lowTemperature
     )
 }
 
@@ -32,20 +41,32 @@ fun WeatherDto.toEntity(cityName: String): WeatherEntity {
     val today = dailyList.firstOrNull()
     return WeatherEntity(
         cityName = cityName,
-        currentTemperature = "${today?.tempMax ?: "--"}℃",
-        description = today?.textDay ?: "--"
+        currentTemperature = formatTemperature(today?.tempMax),
+        description = today?.textDay ?: "--",
+        highTemperature = formatTemperature(today?.tempMax),
+        lowTemperature = formatTemperature(today?.tempMin)
     )
 }
 
-fun WeatherEntity.toWeatherUiStateFromCache(): WeatherUiState.Success {
+fun WeatherEntity.toWeatherUiStateFromCache(sourceLabel: String = "离线缓存"): WeatherUiState.Success {
     return WeatherUiState.Success(
         cityName = cityName,
         currentTemperature = currentTemperature,
         weatherDescription = description,
         forecastItems = emptyList(),
         lastUpdatedText = formatLastUpdated(lastUpdated),
-        sourceLabel = "离线缓存"
+        sourceLabel = sourceLabel,
+        highTemperature = highTemperature,
+        lowTemperature = lowTemperature
     )
+}
+
+private fun formatTemperature(value: String?): String {
+    return if (value.isNullOrBlank()) {
+        "--"
+    } else {
+        "${value}℃"
+    }
 }
 
 private fun formatLastUpdated(timestamp: Long): String {

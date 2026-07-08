@@ -6,6 +6,7 @@ import com.example.weatherforecastapp.data.local.WeatherDatabase
 import com.example.weatherforecastapp.data.remote.WeatherApiService
 import com.example.weatherforecastapp.data.repository.WeatherRepository
 import com.example.weatherforecastapp.data.repository.WeatherRepositoryImp
+import com.example.weatherforecastapp.data.store.StartupSnapshotStore
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
@@ -13,6 +14,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 interface AppContainer {
     val weatherRepository: WeatherRepository
+    val startupSnapshotStore: StartupSnapshotStore
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -29,6 +31,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     private val retrofitService: WeatherApiService by lazy {
         retrofit.create(WeatherApiService::class.java)
+    }
+
+    override val startupSnapshotStore: StartupSnapshotStore by lazy {
+        StartupSnapshotStore(context)
     }
 
     override val weatherRepository: WeatherRepository by lazy {

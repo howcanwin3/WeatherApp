@@ -1,4 +1,4 @@
-*.iml
+﻿*.iml
 .gradle
 /local.properties
 /.idea/caches
@@ -13,3 +13,13 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Codex desktop / IME junk written into the repo root
+/*user.config
+/*share.config
+/*local.stat
+/imekernel.log
+/inputstat.dat
+/kernelDetect.ini
+/sgim_*.bin
+/*image.*.db

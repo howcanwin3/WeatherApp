@@ -1,3 +1,60 @@
-<resources>
-    <string name="app_name">WeatherForecastApp</string>
+﻿<resources>
+    <string name="app_name">晴空天气</string>
+    <string name="weather_top_bar_title">今日天气</string>
+    <string name="weather_refresh_content_description">刷新天气</string>
+    <string name="weather_loading_text">正在同步最新天气…</string>
+    <string name="weather_data_source_title">数据来源</string>
+    <string name="weather_last_update_title">最近更新</string>
+    <string name="weather_search_title">城市搜索</string>
+    <string name="weather_search_subtitle">支持模糊搜索，也支持直接切回当前位置。</string>
+    <string name="weather_search_input_label">输入城市</string>
+    <string name="weather_search_button">搜索</string>
+    <string name="weather_use_current_location_button">使用当前位置</string>
+    <string name="weather_searching_candidates">正在搜索城市…</string>
+    <string name="weather_search_candidates_title">请选择正确的城市</string>
+    <string name="weather_search_candidates_subtitle">找到多个同名结果，点选后再查看天气。</string>
+    <string name="weather_forecast_title">未来三日天气</string>
+    <string name="weather_forecast_empty">当前是缓存数据，未来预报会在网络恢复后自动补全。</string>
+    <string name="weather_error_icon_description">错误提示</string>
+    <string name="weather_error_title">天气暂时加载失败</string>
+    <string name="weather_retry_button">重新加载</string>
+
+    <string name="weather_manage_cities_title">城市管理</string>
+    <string name="weather_manage_search_placeholder">搜索位置</string>
+    <string name="weather_search_results_title">搜索结果</string>
+    <string name="weather_search_preview_title">天气预览</string>
+    <string name="weather_add_favorite_button">添加到收藏</string>
+    <string name="weather_added_button">已添加</string>
+    <string name="weather_location_section_title">当前位置</string>
+    <string name="weather_saved_cities_title">已添加城市</string>
+    <string name="weather_current_location_badge">当前定位</string>
+    <string name="weather_saved_city_badge">已收藏</string>
+    <string name="weather_default_city_badge">默认城市</string>
+    <string name="weather_set_default_button">设为默认</string>
+    <string name="weather_delete_favorite_button">删除收藏</string>
+    <string name="weather_location_empty_title">还没有定位天气</string>
+    <string name="weather_location_empty_message">点击下方按钮重新拉取当前定位天气，成功后会显示在这里。</string>
+    <string name="weather_location_notice_title">定位提醒</string>
+    <string name="weather_location_retry_button">重新定位</string>
+    <string name="weather_favorites_empty_title">还没有收藏城市</string>
+    <string name="weather_favorites_empty_message">先在上方搜索城市，预览天气后就可以一键加入收藏。</string>
+    <string name="weather_preview_loading_text">正在加载该城市的天气预览…</string>
+    <string name="weather_placeholder_description">天气待同步</string>
+
+    <string name="weather_location_failed_message">暂时无法获取当前位置，请检查系统定位开关后重试。</string>
+    <string name="weather_location_permission_denied_message">你还未允许定位权限，目前可先查看默认城市天气。</string>
+    <string name="weather_location_settings_message">定位权限已关闭，可前往系统设置重新开启。</string>
+    <string name="weather_location_service_disabled_message">已获得定位权限，但系统定位开关未打开，目前已先切回城市天气。</string>
+    <string name="weather_location_service_title">打开系统定位</string>
+    <string name="weather_location_service_message">应用已有定位权限，但手机的系统定位开关未打开。打开后，才能获取当前位置天气。</string>
+    <string name="weather_location_service_confirm">去打开</string>
+    <string name="weather_location_service_dismiss">先看城市天气</string>
+    <string name="weather_permission_rationale_title">允许定位权限</string>
+    <string name="weather_permission_rationale_message">定位权限可帮助应用自动展示你当前位置的天气。若你暂时不想开启，也可以继续手动查看城市天气。</string>
+    <string name="weather_permission_rationale_confirm">再次授权</string>
+    <string name="weather_permission_rationale_dismiss">暂不启用</string>
+    <string name="weather_permission_settings_title">定位权限已关闭</string>
+    <string name="weather_permission_settings_message">当前定位权限已被禁用。你可以前往系统设置手动开启，或继续使用城市管理查看天气。</string>
+    <string name="weather_permission_settings_confirm">打开设置</string>
+    <string name="weather_permission_settings_dismiss">继续查看城市</string>
 </resources>
