@@ -29,7 +29,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "QWEATHER_API_KEY", "\"$weatherApiKey\"")
+        resValue("string", "qweather_api_key", weatherApiKey)
     }
 
     buildTypes {
@@ -47,7 +47,7 @@ android {
     }
     buildFeatures {
         compose = true
-        buildConfig = true
+        resValues = true
     }
 }
 

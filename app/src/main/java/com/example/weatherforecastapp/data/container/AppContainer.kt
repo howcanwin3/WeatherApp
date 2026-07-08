@@ -1,7 +1,7 @@
 ﻿package com.example.weatherforecastapp.data.container
 
 import android.content.Context
-import com.example.weatherforecastapp.BuildConfig
+import com.example.weatherforecastapp.R
 import com.example.weatherforecastapp.data.local.WeatherDatabase
 import com.example.weatherforecastapp.data.remote.WeatherApiService
 import com.example.weatherforecastapp.data.repository.WeatherRepository
@@ -41,7 +41,7 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         WeatherRepositoryImp(
             apiService = retrofitService,
             weatherDao = WeatherDatabase.getDatabase(context).weatherDao(),
-            apiKey = BuildConfig.QWEATHER_API_KEY
+            apiKey = context.getString(R.string.qweather_api_key)
         )
     }
 }

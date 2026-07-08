@@ -1,4 +1,4 @@
-﻿*.iml
+*.iml
 .gradle
 /local.properties
 /.idea/caches
@@ -23,3 +23,7 @@ local.properties
 /kernelDetect.ini
 /sgim_*.bin
 /*image.*.db
+
+# Local-only notes and backups
+/Backup/
+*.local.md
